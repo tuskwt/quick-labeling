@@ -45,13 +45,13 @@
             background-color: #f9fafb;
             color: #9ca3af;
             text-align: right;
-            padding: 8px 6px;
+            padding: 8px 4px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             line-height: 1.5;
             border-right: 1px solid #e5e7eb;
             user-select: none;
-            width: 2.5rem;
+            width: 1.8rem; /* Lebih ramping untuk hemat tempat */
             overflow: hidden;
         }
 
@@ -60,7 +60,7 @@
             border: none;
             padding: 8px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
+            font-size: 0.7rem; /* Font lebih kecil agar muat 3 kolom */
             line-height: 1.5;
             white-space: pre; 
             overflow: auto;
@@ -113,7 +113,7 @@
             line-height: 1.1;
             word-break: break-word;
             white-space: normal;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .label-nis {
@@ -144,7 +144,7 @@
             </div>
             <div>
                 <h1 class="text-sm md:text-xl font-bold text-gray-800 leading-tight">SKWT Label Generator</h1>
-                <p class="text-[10px] md:text-xs text-gray-500 hidden sm:block">Nama & NISN Siap Cetak</p>
+                <p class="text-[10px] md:text-xs text-gray-500 hidden sm:block">Support 3 Kolom (Nama, NIS, NISN)</p>
             </div>
         </div>
         <div class="flex gap-2">
@@ -164,19 +164,17 @@
     <div class="flex flex-col md:flex-row flex-1 overflow-auto md:overflow-hidden relative z-0">
         
         <!-- Sidebar Input -->
-        <aside class="w-full md:w-1/3 md:min-w-[380px] md:max-w-[480px] bg-white border-b md:border-b-0 md:border-r border-gray-200 flex flex-col no-print shrink-0 md:h-full md:overflow-y-auto">
-            <div class="p-4 md:p-5 space-y-4">
+        <aside class="w-full md:w-1/3 md:min-w-[420px] md:max-w-[550px] bg-white border-b md:border-b-0 md:border-r border-gray-200 flex flex-col no-print shrink-0 md:h-full md:overflow-y-auto">
+            <div class="p-3 md:p-4 space-y-4">
                 
                 <!-- Input Area -->
                 <div>
                     <div class="flex justify-between items-center mb-3">
                         <label class="block text-sm font-bold text-gray-800">Input Data</label>
                         <div class="flex gap-2">
-                            <!-- Tombol Reset (FIXED) -->
                             <button onclick="clearData()" class="text-xs text-red-600 hover:bg-red-50 border border-red-200 px-2 py-1 rounded transition flex items-center gap-1 font-bold" title="Hapus input dan reset">
-                                <i class="fa-solid fa-trash-can"></i> Hapus Semua
+                                <i class="fa-solid fa-trash-can"></i> Reset
                             </button>
-                            <!-- Tombol Contoh -->
                             <button onclick="loadSampleData()" class="text-xs text-blue-600 hover:bg-blue-50 border border-blue-200 px-2 py-1 rounded transition flex items-center gap-1 font-semibold">
                                 <i class="fa-solid fa-magic"></i> Contoh
                             </button>
@@ -185,30 +183,36 @@
                     
                     <div class="bg-yellow-50 border border-yellow-100 p-2 rounded-md mb-3 text-xs text-yellow-800 flex items-start gap-2">
                         <i class="fa-solid fa-circle-info mt-0.5"></i>
-                        <span class="leading-tight">Cek nomor baris agar Nama & NISN sejajar. Gunakan strip (-) jika NISN tidak ada.</span>
+                        <span class="leading-tight">Jika salah satu kosong, tanda garis miring (/) tidak akan muncul.</span>
                     </div>
 
-                    <!-- Editor Grid with Line Numbers -->
-                    <div class="grid grid-cols-2 gap-3 h-56 md:h-80">
+                    <!-- 3 Column Editor Grid -->
+                    <div class="grid grid-cols-3 gap-2 h-56 md:h-80">
                         
                         <!-- Kolom Nama -->
                         <div class="flex flex-col h-full overflow-hidden">
-                            <label class="text-xs font-semibold text-gray-500 mb-1 flex justify-between">
-                                <span>1. Nama</span>
-                                <span class="text-gray-300 text-[10px]">Wajib</span>
-                            </label>
+                            <label class="text-[10px] uppercase font-bold text-gray-500 mb-1 truncate">1. Nama</label>
                             <div class="editor-container">
                                 <div id="lineNumbersName" class="line-numbers">1</div>
-                                <textarea id="inputNames" class="editor-textarea" placeholder="Ahmad&#10;Budi&#10;Citra" spellcheck="false"></textarea>
+                                <textarea id="inputNames" class="editor-textarea" placeholder="Ahmad&#10;Budi" spellcheck="false"></textarea>
                             </div>
                         </div>
 
-                        <!-- Kolom NISN -->
+                        <!-- Kolom NIS -->
                         <div class="flex flex-col h-full overflow-hidden">
-                            <label class="text-xs font-semibold text-gray-500 mb-1">2. NISN / NIS</label>
+                            <label class="text-[10px] uppercase font-bold text-gray-500 mb-1 truncate">2. NIS</label>
                             <div class="editor-container">
                                 <div id="lineNumbersNIS" class="line-numbers">1</div>
-                                <textarea id="inputNIS" class="editor-textarea" placeholder="12345&#10;-&#10;12347" spellcheck="false"></textarea>
+                                <textarea id="inputNIS" class="editor-textarea" placeholder="1001&#10;-" spellcheck="false"></textarea>
+                            </div>
+                        </div>
+
+                         <!-- Kolom NISN -->
+                         <div class="flex flex-col h-full overflow-hidden">
+                            <label class="text-[10px] uppercase font-bold text-gray-500 mb-1 truncate">3. NISN</label>
+                            <div class="editor-container">
+                                <div id="lineNumbersNISN" class="line-numbers">1</div>
+                                <textarea id="inputNISN" class="editor-textarea" placeholder="001234&#10;001235" spellcheck="false"></textarea>
                             </div>
                         </div>
 
@@ -249,11 +253,11 @@
 
                     <div class="grid grid-cols-2 gap-3 mb-4">
                         <div>
-                            <label class="block text-[10px] md:text-xs font-medium text-gray-500 mb-1">Font Nama (px)</label>
+                            <label class="block text-[10px] md:text-xs font-medium text-gray-500 mb-1">Ukuran Nama</label>
                             <input type="number" id="fontSizeName" value="26" class="w-full p-2 border border-gray-300 rounded-md text-xs md:text-sm bg-white">
                         </div>
                         <div>
-                            <label class="block text-[10px] md:text-xs font-medium text-gray-500 mb-1">Font NISN (px)</label>
+                            <label class="block text-[10px] md:text-xs font-medium text-gray-500 mb-1">Ukuran Angka</label>
                             <input type="number" id="fontSizeNIS" value="18" class="w-full p-2 border border-gray-300 rounded-md text-xs md:text-sm bg-white">
                         </div>
                     </div>
@@ -275,7 +279,7 @@
                     <!-- Content will be injected here -->
                     <div class="text-center text-gray-400 mt-10 md:mt-20 px-4">
                         <i class="fa-solid fa-arrow-up md:fa-arrow-left text-2xl mb-2 animate-bounce"></i>
-                        <p class="text-sm">Isi Nama & NISN di panel input.</p>
+                        <p class="text-sm">Isi Nama, NIS, & NISN di panel input.</p>
                     </div>
                 </div>
             </div>
@@ -285,18 +289,20 @@
     <script>
         let parsedData = [];
 
-        // Fungsi Helper untuk Render Nomor Baris (Default minimal 20 baris)
+        // Helper: Render Default Line Numbers
         function renderDefaultLines() {
             const defaultLines = Array.from({length: 20}, (_, i) => i + 1).join('<br>');
             document.getElementById('lineNumbersName').innerHTML = defaultLines;
             document.getElementById('lineNumbersNIS').innerHTML = defaultLines;
+            document.getElementById('lineNumbersNISN').innerHTML = defaultLines;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             const namesInput = document.getElementById('inputNames');
             const nisInput = document.getElementById('inputNIS');
+            const nisnInput = document.getElementById('inputNISN');
             
-            // Logic Sinkronisasi Nomor Baris
+            // Sync Function
             const syncLines = (input, lineEl) => {
                 const lineCount = input.value.split('\n').length;
                 const renderCount = Math.max(lineCount, 20); 
@@ -307,24 +313,19 @@
                 lineEl.scrollTop = input.scrollTop;
             };
 
-            // Event Listeners
-            namesInput.addEventListener('input', () => {
-                syncLines(namesInput, document.getElementById('lineNumbersName'));
-                updateCount();
-            });
-            namesInput.addEventListener('scroll', () => {
-                syncScroll(namesInput, document.getElementById('lineNumbersName'));
-            });
+            // Setup Listeners for Name
+            namesInput.addEventListener('input', () => { syncLines(namesInput, document.getElementById('lineNumbersName')); updateCount(); });
+            namesInput.addEventListener('scroll', () => { syncScroll(namesInput, document.getElementById('lineNumbersName')); });
 
-            nisInput.addEventListener('input', () => {
-                syncLines(nisInput, document.getElementById('lineNumbersNIS'));
-                updateCount();
-            });
-            nisInput.addEventListener('scroll', () => {
-                syncScroll(nisInput, document.getElementById('lineNumbersNIS'));
-            });
+            // Setup Listeners for NIS
+            nisInput.addEventListener('input', () => { syncLines(nisInput, document.getElementById('lineNumbersNIS')); updateCount(); });
+            nisInput.addEventListener('scroll', () => { syncScroll(nisInput, document.getElementById('lineNumbersNIS')); });
 
-            // Init Baris Awal
+            // Setup Listeners for NISN
+            nisnInput.addEventListener('input', () => { syncLines(nisnInput, document.getElementById('lineNumbersNISN')); updateCount(); });
+            nisnInput.addEventListener('scroll', () => { syncScroll(nisnInput, document.getElementById('lineNumbersNISN')); });
+
+            // Init
             renderDefaultLines();
         });
 
@@ -338,62 +339,53 @@
             }
         }
 
-        // --- FUNGSI RESET DATA (FIXED) ---
+        // --- RESET DATA ---
         function clearData() {
             if(confirm("Yakin ingin menghapus SEMUA input dan output?")) {
                 const namesInput = document.getElementById('inputNames');
                 const nisInput = document.getElementById('inputNIS');
+                const nisnInput = document.getElementById('inputNISN');
                 const countDisplay = document.getElementById('countDisplay');
                 const previewArea = document.getElementById('preview-area');
                 
-                // 1. KOSONGKAN NILAI INPUT
+                // Clear Values
                 namesInput.value = "";
                 nisInput.value = "";
+                nisnInput.value = "";
                 
-                // 2. Reset Data Internal
+                // Reset State
                 parsedData = [];
-
-                // 3. Reset Counter
                 countDisplay.innerText = "0";
-
-                // 4. Reset Nomor Baris ke Default (1)
                 renderDefaultLines();
                 
-                // 5. Kosongkan Preview
+                // Clear Preview
                 previewArea.innerHTML = `<div class="text-center text-gray-400 mt-10 md:mt-20 px-4">
                         <i class="fa-solid fa-arrow-up md:fa-arrow-left text-2xl mb-2 animate-bounce"></i>
-                        <p class="text-sm">Data telah direset. Silakan isi kembali.</p>
+                        <p class="text-sm">Data telah direset.</p>
                     </div>`;
             }
         }
 
         function loadSampleData() {
-            const names = [
-                "MUHAMMAD RIZKY", "SITI AMINAH", "AHMAD FAUZI", "DEWI SARTIKA", 
-                "BUDI SANTOSO", "CITRA KIRANA", "EKO PATRIO", "FAJAR NUGRAHA",
-                "GITA GUTAWA", "HARY TANOE", "INDAH PERMATA", "JOKO WIDODO",
-                "KARTINI PUTRI", "LUKMAN SARDI"
-            ];
-            const nises = [
-                "0012345678", "0012345679", "0012345680", "-",
-                "", "0012345683", "0012345684", "0012345685",
-                "-", "0012345687", ".", "0012345689",
-                "0012345690", ""
-            ];
+            const names = ["MUHAMMAD RIZKY", "SITI AMINAH", "AHMAD FAUZI", "DEWI SARTIKA", "BUDI SANTOSO", "CITRA KIRANA"];
+            const nises = ["1001", "1002", "1003", "-", "", "1006"];
+            const nisns = ["0012345678", "0012345679", "", "0012345681", "0012345682", "-"];
             
             const namesInput = document.getElementById('inputNames');
             const nisInput = document.getElementById('inputNIS');
+            const nisnInput = document.getElementById('inputNISN');
 
             namesInput.value = names.join('\n');
             nisInput.value = nises.join('\n');
+            nisnInput.value = nisns.join('\n');
             
-            // Trigger update manual agar line numbers mengikuti jumlah data
+            // Trigger update line numbers
             namesInput.dispatchEvent(new Event('input'));
             nisInput.dispatchEvent(new Event('input'));
+            nisnInput.dispatchEvent(new Event('input'));
             
             generateLabels();
             
-            // Scroll ke preview jika di HP
             if(window.innerWidth < 768) {
                 const previewArea = document.querySelector('main');
                 previewArea.scrollIntoView({behavior: 'smooth'});
@@ -403,16 +395,19 @@
         function parseInputData() {
             const rawNames = document.getElementById('inputNames').value.split('\n');
             const rawNIS = document.getElementById('inputNIS').value.split('\n');
+            const rawNISN = document.getElementById('inputNISN').value.split('\n');
             
             parsedData = [];
-            const maxLines = Math.max(rawNames.length, rawNIS.length);
+            const maxLines = Math.max(rawNames.length, rawNIS.length, rawNISN.length);
 
             for(let i=0; i<maxLines; i++) {
                 const name = rawNames[i] ? rawNames[i].trim() : "";
                 let nis = rawNIS[i] ? rawNIS[i].trim() : "";
+                let nisn = rawNISN[i] ? rawNISN[i].trim() : "";
 
-                if(name) {
-                    parsedData.push({ name, nis });
+                // Jika setidaknya ada salah satu data (Nama/NIS/NISN), anggap baris ini valid
+                if(name || nis || nisn) {
+                    parsedData.push({ name, nis, nisn });
                 }
             }
         }
@@ -446,14 +441,23 @@
                 if(borderStyle === 'none') card.style.border = 'none';
                 else card.style.borderStyle = borderStyle;
 
-                let nisHtml = '';
-                if(item.nis && item.nis !== "") {
-                     nisHtml = `<div class="label-nis" style="font-size: ${fontSizeNIS}px">${item.nis}</div>`;
+                // --- LOGIKA OUTPUT (NIS / NISN) ---
+                let bottomText = "";
+                const hasNIS = item.nis && item.nis !== "";
+                const hasNISN = item.nisn && item.nisn !== "";
+
+                if (hasNIS && hasNISN) {
+                    bottomText = `${item.nis} / ${item.nisn}`;
+                } else if (hasNIS) {
+                    bottomText = item.nis;
+                } else if (hasNISN) {
+                    bottomText = item.nisn;
                 }
+                // Jika keduanya kosong, bottomText string kosong.
 
                 let html = `
                     <div class="label-name" style="font-size: ${fontSizeName}px">${item.name}</div>
-                    ${nisHtml}
+                    <div class="label-nis" style="font-size: ${fontSizeNIS}px">${bottomText}</div>
                 `;
                 
                 card.innerHTML = html;
@@ -471,7 +475,7 @@
             const ws = XLSX.utils.json_to_sheet(parsedData);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Label");
-            XLSX.writeFile(wb, "Data_Label.xlsx");
+            XLSX.writeFile(wb, "Data_Label_3Kolom.xlsx");
         }
 
         function downloadDOCX() {
@@ -507,7 +511,7 @@
                 }],
             });
 
-            Packer.toBlob(doc).then(blob => saveAs(blob, `Label_Siswa.docx`));
+            Packer.toBlob(doc).then(blob => saveAs(blob, `Label_Siswa_3Kolom.docx`));
         }
 
         function createRowsForDocx(colCount) {
@@ -547,7 +551,7 @@
                             alignment: AlignmentType.CENTER,
                             children: [
                                 new TextRun({ 
-                                    text: item.nis,
+                                    text: generateBottomText(item), // Helper function for docx logic
                                     bold: true,
                                     size: wordSizeNIS,
                                     color: "000000"
@@ -568,9 +572,22 @@
             });
             return rows;
         }
+
+        // Helper Logic for DOCX (Duplicate of HTML logic)
+        function generateBottomText(item) {
+            const hasNIS = item.nis && item.nis !== "";
+            const hasNISN = item.nisn && item.nisn !== "";
+
+            if (hasNIS && hasNISN) {
+                return `${item.nis} / ${item.nisn}`;
+            } else if (hasNIS) {
+                return item.nis;
+            } else if (hasNISN) {
+                return item.nisn;
+            }
+            return "";
+        }
     </script>
 </body>
 </html>
-
-
 
