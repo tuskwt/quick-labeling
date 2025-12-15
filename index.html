@@ -5,9 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SKWT Label Generator</title>
-  <!-- Favicon menggunakan logo SMK Sukawati Sragen -->
-<link rel="icon" type="image/png" sizes="32x32" href="https://www.smksukawatisragen.sch.id/media_library/images/276e52d7e3b9ac805b7b6504b56de5b8.png">
-<link rel="icon" type="image/png" sizes="16x16" href="https://www.smksukawatisragen.sch.id/media_library/images/276e52d7e3b9ac805b7b6504b56de5b8.png">
+    <!-- Favicon menggunakan logo SMK Sukawati Sragen -->
+    <link rel="icon" type="image/png" sizes="32x32"
+        href="https://www.smksukawatisragen.sch.id/media_library/images/276e52d7e3b9ac805b7b6504b56de5b8.png">
+    <link rel="icon" type="image/png" sizes="16x16"
+        href="https://www.smksukawatisragen.sch.id/media_library/images/276e52d7e3b9ac805b7b6504b56de5b8.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
@@ -215,7 +217,8 @@
 
         <!-- SETTINGS -->
         <section class="bg-gray-100 border-b border-gray-300 py-3 shadow-inner">
-            <div class="container mx-auto px-2 md:px-4">
+            <div class="container mx-auto px-2 md:px-4 space-y-3">
+                <!-- Row 1: Layout Config -->
                 <div class="grid grid-cols-2 md:flex md:flex-wrap gap-2 items-end">
                     <div>
                         <label class="text-[10px] font-bold text-gray-500 block uppercase">Ukuran</label>
@@ -264,6 +267,46 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- Row 2: Appearance Config -->
+                <div class="grid grid-cols-2 md:flex md:flex-wrap gap-2 items-end border-t pt-2 border-gray-200">
+                    <div class="w-full md:w-auto">
+                        <label class="text-[10px] font-bold text-gray-500 block uppercase">Font</label>
+                        <select id="cfgFont" onchange="generatePreview()"
+                            class="w-full px-2 py-1.5 border border-gray-300 rounded text-xs font-bold text-gray-800">
+                            <option value="Arial, sans-serif" selected>Arial</option>
+                            <option value="'Times New Roman', serif">Times New Roman</option>
+                            <option value="'Courier New', monospace">Courier New</option>
+                            <option value="'Inter', sans-serif">Inter</option>
+                            <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-500 block uppercase">Size Nama</label>
+                        <input type="number" id="cfgSizeName" value="26" onchange="generatePreview()"
+                            class="w-20 px-2 py-1.5 border border-gray-300 rounded text-xs font-bold text-gray-800">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-500 block uppercase">Size NIS</label>
+                        <input type="number" id="cfgSizeNum" value="18" onchange="generatePreview()"
+                            class="w-20 px-2 py-1.5 border border-gray-300 rounded text-xs font-bold text-gray-800">
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-500 block uppercase"
+                            title="Lebar Label (cm) - Mengubah ini akan mengabaikan kolom">Lebar (cm)</label>
+                        <input type="number" id="cfgWidth" min="1" step="0.1" onchange="generatePreview(true)"
+                            class="w-20 px-2 py-1.5 border border-gray-300 rounded text-xs font-bold text-gray-800"
+                            placeholder="Auto">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-500 block uppercase"
+                            title="Tinggi Label (cm)">Tinggi (cm)</label>
+                        <input type="number" id="cfgHeight" min="1" step="0.1" onchange="generatePreview(true)"
+                            class="w-20 px-2 py-1.5 border border-gray-300 rounded text-xs font-bold text-gray-800"
+                            placeholder="Auto">
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -310,10 +353,7 @@
                     Total Data: <span id="countDisplay">0</span>
                 </div>
 
-                <div class="hidden">
-                    <input id="cfgSizeName" value="26">
-                    <input id="cfgSizeNum" value="18">
-                </div>
+
             </div>
         </section>
 
@@ -354,7 +394,10 @@
             cols: document.getElementById('cfgCols'),
             border: document.getElementById('cfgBorder'),
             sizeName: document.getElementById('cfgSizeName'),
-            sizeNum: document.getElementById('cfgSizeNum')
+            sizeNum: document.getElementById('cfgSizeNum'),
+            font: document.getElementById('cfgFont'),
+            width: document.getElementById('cfgWidth'),
+            height: document.getElementById('cfgHeight')
         };
 
         let parsedData = [];
@@ -399,7 +442,7 @@
         }
 
         // --- GEOMETRIC CALCULATOR ---
-        function calculatePageCapacity() {
+        function calculatePageCapacity(forceRecalc = false) {
             const paper = config.paper.value;
             const orient = config.orient.value;
             const cols = parseInt(config.cols.value);
@@ -407,24 +450,49 @@
             let pageH = (paper === 'F4') ? 330 : 297;
             if (orient === 'landscape') { [pageW, pageH] = [pageH, pageW]; }
 
-            const cardW = (pageW - 40 - (cols - 1) * 4) / cols;
-            const cardH = cardW / 2;
-            const maxRows = Math.floor((pageH - 40 + 4 + 0.1) / (cardH + 4));
-            return { itemsPerPage: Math.max(1, maxRows) * cols, cssWidth: pageW + 'mm', cssHeight: pageH + 'mm' };
+            const autoCardW = (pageW - 40 - (cols - 1) * 4) / cols;
+            const autoCardH = autoCardW / 2;
+
+            let finalW = autoCardW;
+            let finalH = autoCardH;
+
+            if (forceRecalc) {
+                config.width.value = (autoCardW / 10).toFixed(2);
+                config.height.value = (autoCardH / 10).toFixed(2);
+            } else {
+                if (config.width.value) finalW = parseFloat(config.width.value) * 10;
+                if (config.height.value) finalH = parseFloat(config.height.value) * 10;
+            }
+
+            const maxRows = Math.floor((pageH - 40 + 4 + 0.1) / (finalH + 4));
+
+            return {
+                itemsPerPage: Math.max(1, maxRows) * cols,
+                cssWidth: pageW + 'mm',
+                cssHeight: pageH + 'mm',
+                cardWidth: finalW,
+                cardHeight: finalH
+            };
         }
 
-        function generatePreview() {
+        function generatePreview(isManual = false) {
+            const activeId = document.activeElement ? document.activeElement.id : '';
+            const forceRecalc = ['cfgPaper', 'cfgOrient', 'cfgCols'].includes(activeId);
+
             parseData();
             const anchor = document.getElementById('preview-anchor');
             anchor.innerHTML = '';
             if (parsedData.length === 0) {
                 anchor.innerHTML = '<div class="text-center text-gray-500 py-10 opacity-70"><p>Data Kosong...</p></div>';
+                calculatePageCapacity(forceRecalc);
                 return;
             }
-            const capacity = calculatePageCapacity();
+            const capacity = calculatePageCapacity(forceRecalc);
             const orient = config.orient.value;
             const cols = parseInt(config.cols.value);
             const totalPages = Math.ceil(parsedData.length / capacity.itemsPerPage);
+
+            const fontVal = config.font.value;
 
             const docFragment = document.createDocumentFragment();
             for (let p = 0; p < totalPages; p++) {
@@ -434,11 +502,17 @@
                 sheet.style.minHeight = capacity.cssHeight;
                 const grid = document.createElement('div');
                 grid.className = `label-grid`;
-                grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+                grid.style.gridTemplateColumns = `repeat(${cols}, max-content)`;
+                grid.style.justifyContent = 'space-between';
 
                 parsedData.slice(p * capacity.itemsPerPage, (p + 1) * capacity.itemsPerPage).forEach(item => {
                     const card = document.createElement('div');
                     card.className = 'label-card';
+                    card.style.fontFamily = fontVal;
+                    card.style.width = `${capacity.cardWidth}mm`;
+                    card.style.height = `${capacity.cardHeight}mm`;
+                    card.style.padding = '2mm';
+
                     if (config.border.value === 'none') card.style.border = 'none';
                     else if (config.border.value === 'dashed') card.style.borderStyle = 'dashed';
                     else card.style.borderStyle = 'solid';
@@ -463,37 +537,58 @@
             parseData();
             if (parsedData.length === 0) return alert("Data Kosong!");
 
+            const activeId = document.activeElement ? document.activeElement.id : '';
+            const forceRecalc = ['cfgPaper', 'cfgOrient', 'cfgCols'].includes(activeId);
+            const capacity = calculatePageCapacity(forceRecalc);
+
             const { Document, Packer, Paragraph, Table, TableRow, TableCell, WidthType, BorderStyle, TextRun, AlignmentType, PageOrientation, VerticalAlign } = docx;
             const colCount = parseInt(config.cols.value);
             const orient = config.orient.value;
             const paper = config.paper.value;
 
-            const mmToTwip = 56.69;
+            const mmToTwip = 56.6929; // 1mm = 56.7 twips
             let pW = (paper === 'F4' ? 215 : 210) * mmToTwip;
             let pH = (paper === 'F4' ? 330 : 297) * mmToTwip;
             if (orient === 'landscape') [pW, pH] = [pH, pW];
 
             const rows = [];
             let cells = [];
-            const fontFace = "Arial";
-            const sizeName = 39;
-            const sizeNum = 27;
+
+            // Extract Font Name from value (remove backup fonts)
+            // e.g., "Arial, sans-serif" -> "Arial"
+            let userFontRaw = config.font.value.split(',')[0].replace(/['"]/g, '').trim();
+            const fontFace = userFontRaw || "Arial";
+
+            // Convert Sizes
+            // DOCX 'size' is in half-points (1/144 inch).
+            // Web px is ~1/96 inch.
+            // 1px ≈ 0.75pt.
+            // docxSize = px * 0.75 * 2 = px * 1.5.
+            const sizeName = Math.round(config.sizeName.value * 1.5);
+            const sizeNum = Math.round(config.sizeNum.value * 1.5);
+
+            // Convert Padding to Twips
+            const padTwips = Math.round(2 * mmToTwip);
+
+            // Fixed Cell Width based on Label Size
+            const cellWidthTwips = capacity.cardWidth * mmToTwip;
+            const cellHeightTwips = capacity.cardHeight * mmToTwip;
 
             parsedData.forEach((item, i) => {
                 cells.push(new TableCell({
                     verticalAlign: VerticalAlign.CENTER,
-                    margins: { top: 120, bottom: 120, left: 100, right: 100 },
+                    margins: { top: padTwips, bottom: padTwips, left: padTwips, right: padTwips },
                     children: [
                         new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: item.name, bold: true, size: sizeName, font: fontFace })] }),
                         new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: getBottomText(item), bold: true, size: sizeNum, font: fontFace })] })
                     ],
                     borders: config.border.value === 'none' ? { top: { style: BorderStyle.NONE }, bottom: { style: BorderStyle.NONE }, left: { style: BorderStyle.NONE }, right: { style: BorderStyle.NONE } }
                         : { top: { style: BorderStyle.SINGLE }, bottom: { style: BorderStyle.SINGLE }, left: { style: BorderStyle.SINGLE }, right: { style: BorderStyle.SINGLE } },
-                    width: { size: 100 / colCount, type: WidthType.PERCENTAGE }
+                    width: { size: cellWidthTwips, type: WidthType.DXA }
                 }));
                 if (cells.length === colCount || i === parsedData.length - 1) {
-                    while (cells.length < colCount) cells.push(new TableCell({ children: [], width: { size: 100 / colCount, type: WidthType.PERCENTAGE } }));
-                    rows.push(new TableRow({ children: cells }));
+                    while (cells.length < colCount) cells.push(new TableCell({ children: [], width: { size: cellWidthTwips, type: WidthType.DXA } }));
+                    rows.push(new TableRow({ children: cells, height: { value: cellHeightTwips, rule: 'exact' } }));
                     cells = [];
                 }
             });
@@ -501,9 +596,9 @@
             const doc = new Document({
                 sections: [{
                     properties: {
-                        page: { size: { width: pW, height: pH, orientation: orient === 'landscape' ? PageOrientation.LANDSCAPE : PageOrientation.PORTRAIT }, margin: { top: 567, bottom: 567, left: 567, right: 567 } }
+                        page: { size: { width: pW, height: pH, orientation: orient === 'landscape' ? PageOrientation.LANDSCAPE : PageOrientation.PORTRAIT }, margin: { top: 10 * mmToTwip, bottom: 10 * mmToTwip, left: 10 * mmToTwip, right: 10 * mmToTwip } }
                     },
-                    children: [new Table({ rows: rows, width: { size: 100, type: WidthType.PERCENTAGE } })]
+                    children: [new Table({ rows: rows })]
                 }]
             });
 
@@ -575,7 +670,6 @@
             generatePreview(); updateCount(); document.getElementById('preview-anchor').scrollIntoView({ behavior: 'smooth' });
         }
         window.addEventListener('beforeprint', generatePreview);
-
     </script>
 </body>
 
